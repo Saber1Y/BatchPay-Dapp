@@ -1,24 +1,39 @@
 import React, { useState } from "react";
-import { useContractWrite, usePrepareContractWrite } from "wagmi";
+import { useWriteContract } from "wagmi";
 
-const AddEmployeeForm = () => {
+const AddEmployeeForm = ({ contractAddress, abi }) => {
   const [employeeAddress, setEmployeeAddress] = useState("");
   const [salary, setSalary] = useState("");
 
-  const handleAddEmployee = (e) => {
+  // Prepare contract write operation
+  const { write, isLoading, isSuccess, error } = useWriteContract({
+    address: contractAddress,
+    abi: abi,
+    functionName: "addEmployee",
+    args: [employeeAddress, salary],
+  });
+
+  const handleAddEmployee = async (e) => {
     e.preventDefault();
-    write?.();
+    try {
+      const tx = await write?.(); // Execute the write operation
+      await tx.wait(); // Wait for the transaction to be mined
+      alert("Employee added successfully!");
+    } catch (error) {
+      console.error("Error adding employee:", error);
+      alert("Failed to add employee.");
+    }
   };
 
   return (
     <form
       onSubmit={handleAddEmployee}
-      className="mx-auto my-5 space-y-4 w-[400px]"
+      className="space-y-4 mx-auto my-5 w-[400px]"
     >
       <div>
         <label
           htmlFor="employeeAddress"
-          className="block text-sm font-medium text-white"
+          className="block text-[18px] font-medium text-white"
         >
           Employee Address
         </label>
@@ -27,7 +42,7 @@ const AddEmployeeForm = () => {
           id="employeeAddress"
           value={employeeAddress}
           onChange={(e) => setEmployeeAddress(e.target.value)}
-          className="mt-1 block w-full px-3 py-2 border bg-transparent border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          className="mt-1 block w-full px-3 py-2 border bg-transparent border-gray-300 rounded-md shadow-sm focus:outline-none"
           placeholder="0x..."
           required
         />
@@ -35,7 +50,7 @@ const AddEmployeeForm = () => {
       <div>
         <label
           htmlFor="salary"
-          className="block text-sm font-medium text-white"
+          className="block text-[18px] font-medium text-white"
         >
           Salary (ETH)
         </label>
@@ -45,7 +60,7 @@ const AddEmployeeForm = () => {
           id="salary"
           value={salary}
           onChange={(e) => setSalary(e.target.value)}
-          className="mt-1 block w-full px-3 py-2 border bg-transparent border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          className="mt-1 block w-full px-3 py-2 border bg-transparent border-gray-300 rounded-md shadow-sm focus:outline-none "
           placeholder="0.0"
           required
         />
@@ -53,9 +68,11 @@ const AddEmployeeForm = () => {
       <button
         type="submit"
         className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        disabled={isLoading}
       >
-        Add Employee
+        {isLoading ? "Adding..." : "Add Employee"}
       </button>
+      {error && <p className="text-red-600 mt-2">Error: {error.message}</p>}
     </form>
   );
 };
