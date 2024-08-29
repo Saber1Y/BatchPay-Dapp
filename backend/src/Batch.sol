@@ -25,7 +25,7 @@ contract Batch {
         employees.push(_employee);
         employeesSalaries[_employee] = _salary;
     }
-    
+
     function removeEmployee(address _employee) external onlyOwner {
         delete employeesSalaries[_employee];
 
@@ -47,14 +47,13 @@ contract Batch {
                 revert NotEnoughFunds();
             }
 
-            (bool success, ) = payable(employee).call{ value:salary }("");
+            (bool success,) = payable(employee).call{value: salary}("");
 
             if (!success) {
-                revert TransactionFailed();      
-            }           
+                revert TransactionFailed();
+            }
         }
     }
-
 
     function depositFunds() external payable onlyOwner {}
 

@@ -11,17 +11,19 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
     abi: abi,
     functionName: "addEmployee",
     args: [employeeAddress, salary],
+    overrides: {
+      gasLimit: 1000000, // Adjust as needed
+    },
   });
 
   const handleAddEmployee = async (e) => {
     e.preventDefault();
     try {
       const tx = await write?.(); // Execute the write operation
-      await tx.wait(); // Wait for the transaction to be mined
       alert("Employee added successfully!");
     } catch (error) {
       console.error("Error adding employee:", error);
-      alert("Failed to add employee.");
+      alert(`Failed to add employee: ${error.message || "Unknown error"}`);
     }
   };
 
