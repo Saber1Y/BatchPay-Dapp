@@ -6,11 +6,13 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Image from "next/image";
 import { WagmiProvider } from "wagmi";
 import { config } from "./config";
-import AddEmployeeForm from "./components/AddEmployeeForm";
+import AddEmployeeForm from "../components/AddEmployeeForm";
 import batchContract from "../../../backend/out/Batch.sol/Batch.json";
 
 const contractAddress = '0x5FbDB2315678afecb367f032d93F642f64180aa3';
 const abi = batchContract.abi;
+
+
 
 export default function Home() {
   const queryClient = new QueryClient();
