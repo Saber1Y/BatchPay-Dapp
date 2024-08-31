@@ -21,7 +21,10 @@ contract Batch {
         owner = msg.sender;
     }
 
-    function addEmployee(address _employee, uint256 _salary) external onlyOwner {
+    function addEmployee(
+        address _employee,
+        uint256 _salary
+    ) external onlyOwner {
         employees.push(_employee);
         employeesSalaries[_employee] = _salary;
     }
@@ -47,7 +50,7 @@ contract Batch {
                 revert NotEnoughFunds();
             }
 
-            (bool success,) = payable(employee).call{value: salary}("");
+            (bool success, ) = payable(employee).call{value: salary}("");
 
             if (!success) {
                 revert TransactionFailed();
@@ -61,7 +64,13 @@ contract Batch {
         return employees.length;
     }
 
-    function getEmployeesSalaries(address _employee) external view returns (uint256) {
+    function getOwnersBalance() external view returns (uint256) {
+        return address(this).balance;
+    }
+
+    function getEmployeesSalaries(
+        address _employee
+    ) external view returns (uint256) {
         return employeesSalaries[_employee];
     }
 }
