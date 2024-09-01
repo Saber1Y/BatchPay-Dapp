@@ -10,6 +10,8 @@ contract Batch {
     mapping(address => uint256) public employeesSalaries;
     address[] public employees;
 
+    event EmployeePaid(address indexed employee, uint256 amount);
+
     modifier onlyOwner() {
         if (msg.sender != owner) {
             revert NotAuthorized();
@@ -41,7 +43,7 @@ contract Batch {
         }
     }
 
-    function payEmployees() external onlyOwner {
+     function payEmployees() external onlyOwner {
         for (uint256 i = 0; i < employees.length; i++) {
             address employee = employees[i];
             uint256 salary = employeesSalaries[employee];
@@ -55,6 +57,9 @@ contract Batch {
             if (!success) {
                 revert TransactionFailed();
             }
+
+            
+            emit EmployeePaid(employee, salary);
         }
     }
 
