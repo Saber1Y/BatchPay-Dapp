@@ -1,12 +1,22 @@
 import React, { useState, useEffect } from "react";
-import { useWriteContract, useReadContract } from "wagmi";
+import {
+  useWriteContract,
+  useReadContract,
+  useWatchContractEvent,
+} from "wagmi";
 
 const AddEmployeeForm = ({ contractAddress, abi }) => {
   const [employeeAddress, setEmployeeAddress] = useState("");
   const [salary, setSalary] = useState("");
   const [employees, setEmployees] = useState([]);
+  const [events, setEvents] = useState([]);
 
-  const { write, isLoading, isSuccess, error } = useWriteContract({
+  // Hook for adding an employee
+  const {
+    write: addEmployeeWrite,
+    isLoading: isAdding,
+    error: addError,
+  } = useWriteContract({
     address: contractAddress,
     abi: abi,
     functionName: "addEmployee",
@@ -16,24 +26,89 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
     },
   });
 
-  const { data: OwnerBalance, isLoading: BalanceLoading } = useReadContract({
+  // Hook for getting the owner's balance
+  const { data: ownerBalance, isLoading: balanceLoading } = useReadContract({
     address: contractAddress,
     abi: abi,
     functionName: "getOwnersBalance",
   });
 
+  // Hook for removing an employee
+  const {
+    write: removeEmployeeWrite,
+    isLoading: isRemoving,
+    error: removeError,
+  } = useWriteContract({
+    address: contractAddress,
+    abi: abi,
+    functionName: "removeEmployee",
+  });
 
+  const {
+    write: makeEmployeePayment,
+    isLoading: pendingPayment,
+    error: paymentError,
+  } = useWriteContract({
+    address: contractAddress,
+    abi: abi,
+    functionName: "payEmployees",
+  });
+
+  useWatchContractEvent({
+    address: contractAddress,
+    abi: abi,
+    eventName: "EmployeeAdded",
+    listener: (employeeAddress, salary) => {
+      setEvents((prevEvents) => [
+        ...prevEvents,
+        {
+          type: "EmployeePaid",
+          address: employeeAddress,
+          salary: salary.toString(),
+        },
+      ]);
+    },
+  });
+
+  // useWatchContractEvent({
+  //   address: contractAddress,
+  //   abi: abi,
+  //   eventName: "EmployeeRemoved",
+  //   listener: (employeeAddress) => {
+  //     setEvents((prevEvents) => [
+  //       ...prevEvents,
+  //       { type: "EmployeeRemoved", address: employeeAddress },
+  //     ]);
+  //   },
+  // });
+
+  // // Listen for the 'PaymentMade' event
+  // useWatchContractEvent({
+  //   address: contractAddress,
+  //   abi: abi,
+  //   eventName: "PaymentMade",
+  //   listener: (employeeAddress, amount) => {
+  //     setEvents((prevEvents) => [
+  //       ...prevEvents,
+  //       {
+  //         type: "PaymentMade",
+  //         address: employeeAddress,
+  //         amount: amount.toString(),
+  //       },
+  //     ]);
+  //   },
+  // });
 
   useEffect(() => {
-    if (OwnerBalance) {
-      console.log("Deployer's balance:", OwnerBalance.toString(), "ETH");
+    if (ownerBalance) {
+      console.log("Deployer's balance:", ownerBalance.toString(), "ETH");
     }
-  }, [OwnerBalance]);
+  }, [ownerBalance]);
 
   const handleAddEmployee = async (e) => {
     e.preventDefault();
     try {
-      const tx = await write?.();
+      await addEmployeeWrite?.();
       alert("Employee added successfully!");
       setEmployees([...employees, { address: employeeAddress, salary }]);
       setEmployeeAddress("");
@@ -44,8 +119,19 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
     }
   };
 
-  const handleDeleteEmployee = (indexToDelete) => {
-    setEmployees(employees.filter((_, index) => index !== indexToDelete));
+  const handleDeleteEmployee = async (indexToDelete) => {
+    const employeeToDelete = employees[indexToDelete];
+
+    try {
+      await removeEmployeeWrite?.({
+        args: [employeeToDelete.address],
+      });
+      alert("Employee removed successfully on-chain!");
+      setEmployees(employees.filter((_, index) => index !== indexToDelete));
+    } catch (error) {
+      console.error("Error removing employee:", error);
+      alert(`Failed to remove employee: ${error.message || "Unknown error"}`);
+    }
   };
 
   const handleModifyEmployee = (indexToModify) => {
@@ -55,6 +141,15 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
     handleDeleteEmployee(indexToModify);
   };
 
+  const handlePaymentEmployee = async () => {
+    try {
+      await makeEmployeePayment?.();
+      alert("Successfully made payment");
+    } catch (error) {
+      console.error("Error processing payments:", error);
+      alert(`Failed to process payments: ${error.message || "Unknown error"}`);
+    }
+  };
 
   return (
     <div className="container mx-auto py-4">
@@ -98,29 +193,13 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
         <button
           type="submit"
           className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          disabled={isLoading}
+          disabled={isAdding}
         >
-          {isLoading ? "Adding..." : "Add Employee"}
+          {isAdding ? "Adding..." : "Add Employee"}
         </button>
-        {error && <p className="text-red-600 mt-2">Error: {error.message}</p>}
-
-        <div className="my-4">
-          <h3 className="text-lg font-semibold">
-            Contract Balance:{" "}
-            {BalanceLoading
-              ? "Loading..."
-              : `${
-                  OwnerBalance ? ethers.utils.formatEther(OwnerBalance) : "0.00"
-                } ETH`}
-          </h3>
-
-          <button
-            // onClick={handleDepositFunds}
-            className="justify-center py-2 px-4 mr-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600"
-          >
-            Deposit Funds
-          </button>
-        </div>
+        {addError && (
+          <p className="text-red-600 mt-2">Error: {addError.message}</p>
+        )}
       </form>
 
       {employees.length > 0 && (
@@ -174,14 +253,31 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
 
           <div className="mt-6">
             <button
-              // onClick={handlePayEmployees}
+              onClick={handlePaymentEmployee}
               className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              disabled={pendingPayment}
             >
-              Pay Employees
+              {pendingPayment ? "Processing..." : "Pay Employees"}
             </button>
+            {paymentError && (
+              <p className="text-red-600 mt-2">Error: {paymentError.message}</p>
+            )}
           </div>
         </>
       )}
+      <div className="mt-6">
+        <h3 className="text-lg font-semibold">Event Log</h3>
+        <ul>
+          {events.map((event, index) => (
+            <li key={index} className="mb-2">
+              <strong>{event.type}:</strong>{" "}
+              {event.address && `Address: ${event.address}`}{" "}
+              {event.salary && `Salary: ${event.salary}`}{" "}
+              {event.amount && `Amount: ${event.amount}`}
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 };

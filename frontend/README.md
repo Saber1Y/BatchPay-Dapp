@@ -34,3 +34,59 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+
+// SPDX-License-Identifier: <LICENSE_IDENTIFIER>
+pragma solidity ^0.8.0;
+
+import "<IMPORT_PATH>";
+
+contract <CONTRACT_NAME> is <INHERITED_CONTRACTS> {
+    // State Variables
+    <STATE_VARIABLES>
+
+    // Events
+    <EVENT_DECLARATIONS>
+
+    // Modifiers
+    <MODIFIER_DECLARATIONS>
+
+    // Constructor
+    constructor(<CONSTRUCTOR_PARAMETERS>) <CONSTRUCTOR_VISIBILITY> {
+        <CONSTRUCTOR_LOGIC>
+    }
+
+    // Fallback and Receive Functions (if needed)
+    receive() external payable {
+        <RECEIVE_LOGIC>
+    }
+
+    fallback() external payable {
+        <FALLBACK_LOGIC>
+    }
+
+    // Public and External Functions
+    function <PUBLIC_FUNCTION_NAME>(<PARAMETERS>) external <VISIBILITY> returns (<RETURN_TYPE>) {
+        <PUBLIC_FUNCTION_LOGIC>
+    }
+
+    // Internal and Private Functions
+    function <INTERNAL_FUNCTION_NAME>(<PARAMETERS>) internal <VISIBILITY> {
+        <INTERNAL_FUNCTION_LOGIC>
+    }
+
+    // View and Pure Functions
+    function <VIEW_FUNCTION_NAME>(<PARAMETERS>) external view returns (<RETURN_TYPE>) {
+        <VIEW_FUNCTION_LOGIC>
+    }
+
+    function <PURE_FUNCTION_NAME>(<PARAMETERS>) external pure returns (<RETURN_TYPE>) {
+        <PURE_FUNCTION_LOGIC>
+    }
+
+    // Cleanup and Finalization
+    function <FINAL_FUNCTION_NAME>() external <VISIBILITY> {
+        <FINAL_FUNCTION_LOGIC>
+    }
+}
+
