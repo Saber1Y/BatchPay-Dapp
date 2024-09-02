@@ -9,7 +9,7 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
   const [employeeAddress, setEmployeeAddress] = useState("");
   const [salary, setSalary] = useState("");
   const [employees, setEmployees] = useState([]);
-  const [events, setEvents] = useState([]);
+  // const [events, setEvents] = useState([]);
 
   // Hook for adding an employee
   const {
@@ -54,63 +54,34 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
     functionName: "payEmployees",
   });
 
-  useWatchContractEvent({
-    address: contractAddress,
-    abi: abi,
-    eventName: "EmployeeAdded",
-    listener: (employeeAddress, salary) => {
-      setEvents((prevEvents) => [
-        ...prevEvents,
-        {
-          type: "EmployeePaid",
-          address: employeeAddress,
-          salary: salary.toString(),
-        },
-      ]);
-    },
-  });
-
-  // useWatchContractEvent({
-  //   address: contractAddress,
-  //   abi: abi,
-  //   eventName: "EmployeeRemoved",
-  //   listener: (employeeAddress) => {
-  //     setEvents((prevEvents) => [
-  //       ...prevEvents,
-  //       { type: "EmployeeRemoved", address: employeeAddress },
-  //     ]);
-  //   },
-  // });
-
-  // // Listen for the 'PaymentMade' event
-  // useWatchContractEvent({
-  //   address: contractAddress,
-  //   abi: abi,
-  //   eventName: "PaymentMade",
-  //   listener: (employeeAddress, amount) => {
-  //     setEvents((prevEvents) => [
-  //       ...prevEvents,
-  //       {
-  //         type: "PaymentMade",
-  //         address: employeeAddress,
-  //         amount: amount.toString(),
-  //       },
-  //     ]);
-  //   },
-  // });
-
   useEffect(() => {
     if (ownerBalance) {
       console.log("Deployer's balance:", ownerBalance.toString(), "ETH");
     }
   }, [ownerBalance]);
 
+  useEffect(() => {
+    const savedEmployees = localStorage.getItem("employees");
+    if (savedEmployees) {
+      setEmployees(JSON.parse(savedEmployees));
+    }
+  }, []);
+
   const handleAddEmployee = async (e) => {
     e.preventDefault();
     try {
       await addEmployeeWrite?.();
       alert("Employee added successfully!");
-      setEmployees([...employees, { address: employeeAddress, salary }]);
+
+      const updatedEmployees = [
+        ...employees,
+        { address: employeeAddress, salary },
+      ];
+      setEmployees(updatedEmployees);
+
+      // Save to local storage
+      localStorage.setItem("employees", JSON.stringify(updatedEmployees));
+
       setEmployeeAddress("");
       setSalary("");
     } catch (error) {
@@ -267,16 +238,6 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
       )}
       <div className="mt-6">
         <h3 className="text-lg font-semibold">Event Log</h3>
-        <ul>
-          {events.map((event, index) => (
-            <li key={index} className="mb-2">
-              <strong>{event.type}:</strong>{" "}
-              {event.address && `Address: ${event.address}`}{" "}
-              {event.salary && `Salary: ${event.salary}`}{" "}
-              {event.amount && `Amount: ${event.amount}`}
-            </li>
-          ))}
-        </ul>
       </div>
     </div>
   );
