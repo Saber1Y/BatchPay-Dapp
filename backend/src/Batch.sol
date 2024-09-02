@@ -11,6 +11,8 @@ contract Batch {
     address[] public employees;
 
     event EmployeePaid(address indexed employee, uint256 amount);
+    event EmployeeRemoved(address indexed employee, uint256 amount);
+
 
     modifier onlyOwner() {
         if (msg.sender != owner) {
@@ -41,6 +43,8 @@ contract Batch {
                 break;
             }
         }
+
+        emit EmployeeRemoved(employee, salary)
     }
 
      function payEmployees() external onlyOwner {
