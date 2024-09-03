@@ -1,10 +1,10 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { ConnectButton, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import "@rainbow-me/rainbowkit/styles.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import Image from "next/image";
-import { WagmiProvider } from "wagmi";
+import { WagmiProvider, useAccount } from "wagmi";
 import { config } from "./config";
 import AddEmployeeForm from "../components/AddEmployeeForm";
 import batchContract from "../../../backend/out/Batch.sol/Batch.json";
@@ -12,10 +12,33 @@ import batchContract from "../../../backend/out/Batch.sol/Batch.json";
 const contractAddress = '0x5FbDB2315678afecb367f032d93F642f64180aa3';
 const abi = batchContract.abi;
 
+const WalletChecker = ({ onConnect }) => {
+  const { isConnected } = useAccount();
+  const [showForm, setShowForm] = useState(false);
 
+  useEffect(() => {
+    if (isConnected) {
+      setShowForm(true);
+      onConnect();
+    } else {
+      setShowForm(false);
+    }
+  }, [isConnected, onConnect]);
 
+  return (
+    <>
+      {showForm && (
+        <div className="mt-12">
+          <AddEmployeeForm contractAddress={contractAddress} abi={abi} />
+        </div>
+      )}
+    </>
+  );
+};
 export default function Home() {
   const queryClient = new QueryClient();
+  const [isWalletConnected, setIsWalletConnected] = useState(false);
+
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
@@ -27,51 +50,81 @@ export default function Home() {
               </span>
               <div className="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
                 <ConnectButton />
-                <button
-                  data-collapse-toggle="navbar-cta"
-                  type="button"
-                  className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
-                  aria-controls="navbar-cta"
-                  aria-expanded="false"
-                >
-                  <span className="sr-only">Open main menu</span>
-                  <svg
-                    className="w-5 h-5"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 17 14"
-                  >
-                    <path
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M1 1h15M1 7h15M1 13h15"
-                    />
-                  </svg>
-                </button>
-              </div>
-              <div
-                className="items-center justify-between hidden w-full md:flex md:w-auto md:order-1"
-                id="navbar-cta"
-              >
-                <ul className="flex flex-col font-medium p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
-                  <li>
-                    <a
-                      href="#"
-                      className="block py-2 px-3 md:p-0 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:dark:text-blue-500"
-                      aria-current="page"
-                    >
-                      Home
-                    </a>
-                  </li>
-                </ul>
               </div>
             </div>
           </nav>
 
-          <AddEmployeeForm contractAddress={contractAddress} abi={abi} />
+          {!isWalletConnected && (
+            <div className="min-h-screen bg-gray-100 flex flex-col justify-center items-center p-6">
+              <main className="w-full max-w-screen-lg mx-auto text-center">
+                <h1 className="text-4xl font-bold text-gray-900 mb-6">
+                  Revolutionize Employee Payments
+                </h1>
+                <p className="text-lg text-gray-700 mb-8">
+                  Welcome to BatchPay, the ultimate decentralized application (DApp) designed to streamline payroll processes and cut down on traditional banking costs. With BatchPay, you can pay your employees in one click, ensuring transparency, security, and efficiency.
+                </p>
+
+                <div className="bg-white shadow-lg rounded-lg p-8 mb-8">
+                  <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+                    Why BatchPay?
+                  </h2>
+                  <ul className="list-disc list-inside text-left text-gray-700 mb-6">
+                    <li className="mb-2">
+                      <strong>Simplified Payroll:</strong> Manage and pay your entire workforce with a single transaction, reducing manual work and minimizing errors.
+                    </li>
+                    <li className="mb-2">
+                      <strong>Cost-Efficient:</strong> Eliminate the need for third-party payment processors and reduce transaction fees.
+                    </li>
+                    <li className="mb-2">
+                      <strong>Transparent & Secure:</strong> Built on the blockchain, BatchPay ensures that every payment is secure and verifiable.
+                    </li>
+                    <li className="mb-2">
+                      <strong>Empower Your Business:</strong> Gain full control over your payroll with smart contracts, reducing dependence on traditional banking systems.
+                    </li>
+                  </ul>
+
+                  <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+                    Become a CEO
+                  </h2>
+                  <p className="text-lg text-gray-700 mb-6">
+                    Are you ready to take charge? By becoming a CEO on BatchPay, you can:
+                  </p>
+                  <ul className="list-disc list-inside text-left text-gray-700 mb-8">
+                    <li className="mb-2">Add and Manage Employees</li>
+                    <li className="mb-2">Execute Payments</li>
+                    <li className="mb-2">Monitor Transactions</li>
+                  </ul>
+                  <p className="text-lg text-gray-700 mb-6">
+                    To get started, simply connect your wallet and take the first step towards revolutionizing your payroll process.
+                  </p>
+                </div>
+
+                <div className="bg-white shadow-lg rounded-lg p-8">
+                  <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+                    How It Works
+                  </h2>
+                  <ol className="list-decimal list-inside text-left text-gray-700 mb-6">
+                    <li className="mb-2">Connect Your Wallet</li>
+                    <li className="mb-2">Add Employees</li>
+                    <li className="mb-2">One-Click Payments</li>
+                    <li className="mb-2">Track Payments</li>
+                  </ol>
+                </div>
+
+                <div className="mt-8">
+                  <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+                    Ready to Start?
+                  </h2>
+                  <p className="text-lg text-gray-700 mb-6">
+                    Take control of your payroll now. Connect your wallet to begin your journey as a BatchPay CEO.
+                  </p>
+                  <ConnectButton className="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700 transition duration-200" />
+                </div>
+              </main>
+            </div>
+          )}
+
+          <WalletChecker onConnect={() => setIsWalletConnected(true)} />
         </RainbowKitProvider>
       </QueryClientProvider>
     </WagmiProvider>
