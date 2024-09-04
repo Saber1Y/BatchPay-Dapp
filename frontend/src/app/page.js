@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { ConnectButton, RainbowKitProvider } from "@rainbow-me/rainbowkit";
+import { useRouter } from "next/navigation";
 import "@rainbow-me/rainbowkit/styles.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider, useAccount } from "wagmi";
@@ -15,6 +16,7 @@ const abi = batchContract.abi;
 const WalletChecker = ({ onConnect }) => {
   const { isConnected } = useAccount();
   const [showForm, setShowForm] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     if (isConnected) {
@@ -22,6 +24,7 @@ const WalletChecker = ({ onConnect }) => {
       onConnect();
     } else {
       setShowForm(false);
+      router.push('../')
     }
   }, [isConnected, onConnect]);
 
@@ -45,7 +48,7 @@ export default function Home() {
         <RainbowKitProvider>
           <nav className="bg-white border-gray-200 dark:bg-gray-900">
             <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-              <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
+              <span className="self-center text-2xl font-semibold whitespace-nowrap cursor-pointer dark:text-white">
                 BatchPay
               </span>
               <div className="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">

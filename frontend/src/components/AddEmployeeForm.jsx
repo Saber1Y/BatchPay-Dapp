@@ -6,6 +6,7 @@ import {
 } from "wagmi";
 
 const AddEmployeeForm = ({ contractAddress, abi }) => {
+  
   const [employeeAddress, setEmployeeAddress] = useState("");
   const [salary, setSalary] = useState("");
   const [employees, setEmployees] = useState([]);
