@@ -13,7 +13,6 @@ contract Batch {
     event EmployeePaid(address indexed employee, uint256 amount);
     event EmployeeRemoved(address indexed employee, uint256 amount);
 
-
     modifier onlyOwner() {
         if (msg.sender != owner) {
             revert NotAuthorized();
@@ -25,10 +24,7 @@ contract Batch {
         owner = msg.sender;
     }
 
-    function addEmployee(
-        address _employee,
-        uint256 _salary
-    ) external onlyOwner {
+    function addEmployee(address _employee, uint256 _salary) external onlyOwner {
         employees.push(_employee);
         employeesSalaries[_employee] = _salary;
     }
@@ -43,11 +39,9 @@ contract Batch {
                 break;
             }
         }
-
-        emit EmployeeRemoved(employee, salary)
     }
 
-     function payEmployees() external onlyOwner {
+    function payEmployees() external onlyOwner {
         for (uint256 i = 0; i < employees.length; i++) {
             address employee = employees[i];
             uint256 salary = employeesSalaries[employee];
@@ -56,14 +50,11 @@ contract Batch {
                 revert NotEnoughFunds();
             }
 
-            (bool success, ) = payable(employee).call{value: salary}("");
+            (bool success,) = payable(employee).call{value: salary}("");
 
             if (!success) {
                 revert TransactionFailed();
             }
-
-            
-            emit EmployeePaid(employee, salary);
         }
     }
 
@@ -77,9 +68,7 @@ contract Batch {
         return address(this).balance;
     }
 
-    function getEmployeesSalaries(
-        address _employee
-    ) external view returns (uint256) {
+    function getEmployeesSalaries(address _employee) external view returns (uint256) {
         return employeesSalaries[_employee];
     }
 }
