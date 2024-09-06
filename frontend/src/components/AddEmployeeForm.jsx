@@ -3,24 +3,27 @@ import {
   useWriteContract,
   useReadContract,
   useWatchContractEvent,
+  useAccount
 } from "wagmi";
 
 const AddEmployeeForm = ({ contractAddress, abi }) => {
-  
   const [employeeAddress, setEmployeeAddress] = useState("");
   const [salary, setSalary] = useState("");
   const [employees, setEmployees] = useState([]);
-  // const [events, setEvents] = useState([]);
+  const [events, setEvents] = useState([]);
+  const account = useAccount();
 
   // Hook for adding an employee
   const {
-    write: addEmployeeWrite,
+    writeContractAsync: addEmployeeWrite,
     isLoading: isAdding,
     error: addError,
   } = useWriteContract({
+    account,
     address: contractAddress,
     abi: abi,
     functionName: "addEmployee",
+
     args: [employeeAddress, salary],
     overrides: {
       gasLimit: 1000000,
@@ -28,15 +31,15 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
   });
 
   // Hook for getting the owner's balance
-  const { data: ownerBalance, isLoading: balanceLoading } = useReadContract({
-    address: contractAddress,
-    abi: abi,
-    functionName: "getOwnersBalance",
-  });
+  // const { data: ownerBalance, isLoading: balanceLoading } = useReadContract({
+  //   address: contractAddress,
+  //   abi: abi,
+  //   functionName: "getOwnersBalance",
+  // });
 
   // Hook for removing an employee
   const {
-    write: removeEmployeeWrite,
+    writeContract: removeEmployeeWrite,
     isLoading: isRemoving,
     error: removeError,
   } = useWriteContract({
@@ -46,7 +49,7 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
   });
 
   const {
-    write: makeEmployeePayment,
+    writeContract: makeEmployeePayment,
     isLoading: pendingPayment,
     error: paymentError,
   } = useWriteContract({
@@ -55,11 +58,25 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
     functionName: "payEmployees",
   });
 
-  useEffect(() => {
-    if (ownerBalance) {
-      console.log("Deployer's balance:", ownerBalance.toString(), "ETH");
-    }
-  }, [ownerBalance]);
+  //events
+  // useWatchContractEvent({
+  //   abi: abi,
+  //   address: contractAddress,
+  //   eventName: "EmployeePaid",
+  //   onLogs(logs) {
+  //     console.log("Logs received", logs);
+  //     setEvents((prevEvents) => [...prevEvents, logs]); // Store logs in the state
+  //   },
+  //   onError(error) {
+  //     console.error("Error received", error);
+  //   },
+  // });
+
+  // useEffect(() => {
+  //   if (ownerBalance) {
+  //     console.log("Deployer's balance:", ownerBalance.toString(), "ETH");
+  //   }
+  // }, [ownerBalance]);
 
   useEffect(() => {
     const savedEmployees = localStorage.getItem("employees");
@@ -70,25 +87,25 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
 
   const handleAddEmployee = async (e) => {
     e.preventDefault();
-    try {
-      await addEmployeeWrite?.();
-      alert("Employee added successfully!");
 
-      const updatedEmployees = [
-        ...employees,
-        { address: employeeAddress, salary },
-      ];
-      setEmployees(updatedEmployees);
-
-      // Save to local storage
-      localStorage.setItem("employees", JSON.stringify(updatedEmployees));
-
-      setEmployeeAddress("");
-      setSalary("");
-    } catch (error) {
-      console.error("Error adding employee:", error);
-      alert(`Failed to add employee: ${error.message || "Unknown error"}`);
+    await addEmployeeWrite();
+    if (addError) {
+      console.error("Error adding employee:", addError);
+      alert(`Failed to add employee: ${addError.message || "Unknown error"}`);
     }
+    alert("Employee added successfully!");
+
+    const updatedEmployees = [
+      ...employees,
+      { address: employeeAddress, salary },
+    ];
+    setEmployees(updatedEmployees);
+
+    // Save to local storage
+    localStorage.setItem("employees", JSON.stringify(updatedEmployees));
+
+    setEmployeeAddress("");
+    setSalary("");
   };
 
   const handleDeleteEmployee = async (indexToDelete) => {
@@ -166,11 +183,12 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
           type="submit"
           className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           disabled={isAdding}
+          onClick={handleAddEmployee}
         >
           {isAdding ? "Adding..." : "Add Employee"}
         </button>
         {addError && (
-          <p className="text-red-600 mt-2">Error: {addError.message}</p>
+        <p className="text-red-600 mt-2">Error: {addError.message}</p>
         )}
       </form>
 
@@ -239,6 +257,14 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
       )}
       <div className="mt-6">
         <h3 className="text-lg font-semibold">Event Log</h3>
+        <ul className="text-white">
+          {events.map((event, index) => (
+            <li key={index}>
+              Employee {event.args[0]} was paid{" "}
+              {/* {ethers.utils.formatEther(event.args[1])} ETH */}
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );
