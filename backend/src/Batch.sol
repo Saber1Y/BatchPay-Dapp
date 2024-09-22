@@ -11,6 +11,7 @@ contract Batch {
     address[] public employees;
 
     event EmployeePaid(address indexed employee, uint256 amount);
+    event EmployeeAdded(address indexed employee, uint256 amount);
     event EmployeeRemoved(address indexed employee, uint256 amount);
 
     modifier onlyOwner() {
@@ -24,19 +25,26 @@ contract Batch {
         owner = msg.sender;
     }
 
-    function addEmployee(address _employee, uint256 _salary) external onlyOwner {
+    function addEmployee(
+        address _employee,
+        uint256 _salary
+    ) external onlyOwner {
         employees.push(_employee);
         employeesSalaries[_employee] = _salary;
+        emit EmployeeAdded(_employee, _salary);
     }
 
     function removeEmployee(address _employee) external onlyOwner {
-        delete employeesSalaries[_employee];
-
         for (uint256 i = 0; i < employees.length; i++) {
             if (employees[i] == _employee) {
                 employees[i] = employees[employees.length - 1];
                 employees.pop();
-                break;
+
+                uint256 _salary = employeesSalaries[_employee];
+                delete employeesSalaries[_employee];
+                emit EmployeeRemoved(_employee, _salary);
+
+                break; // break out of the loop
             }
         }
     }
@@ -50,11 +58,13 @@ contract Batch {
                 revert NotEnoughFunds();
             }
 
-            (bool success,) = payable(employee).call{value: salary}("");
+            (bool success, ) = payable(employee).call{value: salary}(""); // returns if transfer is successful
 
             if (!success) {
                 revert TransactionFailed();
             }
+
+            emit EmployeePaid(employee, salary);
         }
     }
 
@@ -68,7 +78,9 @@ contract Batch {
         return address(this).balance;
     }
 
-    function getEmployeesSalaries(address _employee) external view returns (uint256) {
+    function getEmployeesSalaries(
+        address _employee
+    ) external view returns (uint256) {
         return employeesSalaries[_employee];
     }
 }

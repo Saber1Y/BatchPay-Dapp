@@ -1,16 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { ConnectButton, RainbowKitProvider } from "@rainbow-me/rainbowkit";
-import { useRouter } from "next/navigation";
 import "@rainbow-me/rainbowkit/styles.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { WagmiProvider, useAccount } from "wagmi";
-import { config } from "./config";
+import batchContract from "../../../backend/out/Work.sol/Work.json";
 import AddEmployeeForm from "../components/AddEmployeeForm";
-import batchContract from "../../../backend/out/Batch.sol/Batch.json";
+import { config } from "./config";
 
-const contractAddress = '0x5FbDB2315678afecb367f032d93F642f64180aa3';
+// const contractAddress = '0x5FbDB2315678afecb367f032d93F642f64180aa3';
+const contractAddress = "0x8a791620dd6260079bf849dc5567adc3f2fdc318";
 const abi = batchContract.abi;
 
 const WalletChecker = ({ onConnect }) => {
@@ -24,7 +25,7 @@ const WalletChecker = ({ onConnect }) => {
       onConnect();
     } else {
       setShowForm(false);
-      router.push('../')
+      router.push("../");
     }
   }, [isConnected, onConnect]);
 
@@ -64,7 +65,11 @@ export default function Home() {
                   Revolutionize Employee Payments
                 </h1>
                 <p className="text-lg text-gray-700 mb-8">
-                  Welcome to BatchPay, the ultimate decentralized application (DApp) designed to streamline payroll processes and cut down on traditional banking costs. With BatchPay, you can pay your employees in one click, ensuring transparency, security, and efficiency.
+                  Welcome to BatchPay, the ultimate decentralized application
+                  (DApp) designed to streamline payroll processes and cut down
+                  on traditional banking costs. With BatchPay, you can pay your
+                  employees in one click, ensuring transparency, security, and
+                  efficiency.
                 </p>
 
                 <div className="bg-white shadow-lg rounded-lg p-8 mb-8">
@@ -73,16 +78,24 @@ export default function Home() {
                   </h2>
                   <ul className="list-disc list-inside text-left text-gray-700 mb-6">
                     <li className="mb-2">
-                      <strong>Simplified Payroll:</strong> Manage and pay your entire workforce with a single transaction, reducing manual work and minimizing errors.
+                      <strong>Simplified Payroll:</strong> Manage and pay your
+                      entire workforce with a single transaction, reducing
+                      manual work and minimizing errors.
                     </li>
                     <li className="mb-2">
-                      <strong>Cost-Efficient:</strong> Eliminate the need for third-party payment processors and reduce transaction fees.
+                      <strong>Cost-Efficient:</strong> Eliminate the need for
+                      third-party payment processors and reduce transaction
+                      fees.
                     </li>
                     <li className="mb-2">
-                      <strong>Transparent & Secure:</strong> Built on the blockchain, BatchPay ensures that every payment is secure and verifiable.
+                      <strong>Transparent & Secure:</strong> Built on the
+                      blockchain, BatchPay ensures that every payment is secure
+                      and verifiable.
                     </li>
                     <li className="mb-2">
-                      <strong>Empower Your Business:</strong> Gain full control over your payroll with smart contracts, reducing dependence on traditional banking systems.
+                      <strong>Empower Your Business:</strong> Gain full control
+                      over your payroll with smart contracts, reducing
+                      dependence on traditional banking systems.
                     </li>
                   </ul>
 
@@ -90,7 +103,8 @@ export default function Home() {
                     Become a CEO
                   </h2>
                   <p className="text-lg text-gray-700 mb-6">
-                    Are you ready to take charge? By becoming a CEO on BatchPay, you can:
+                    Are you ready to take charge? By becoming a CEO on BatchPay,
+                    you can:
                   </p>
                   <ul className="list-disc list-inside text-left text-gray-700 mb-8">
                     <li className="mb-2">Add and Manage Employees</li>
@@ -98,7 +112,8 @@ export default function Home() {
                     <li className="mb-2">Monitor Transactions</li>
                   </ul>
                   <p className="text-lg text-gray-700 mb-6">
-                    To get started, simply connect your wallet and take the first step towards revolutionizing your payroll process.
+                    To get started, simply connect your wallet and take the
+                    first step towards revolutionizing your payroll process.
                   </p>
                 </div>
 
@@ -119,7 +134,8 @@ export default function Home() {
                     Ready to Start?
                   </h2>
                   <p className="text-lg text-gray-700 mb-6">
-                    Take control of your payroll now. Connect your wallet to begin your journey as a BatchPay CEO.
+                    Take control of your payroll now. Connect your wallet to
+                    begin your journey as a BatchPay CEO.
                   </p>
                   <ConnectButton className="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700 transition duration-200" />
                 </div>

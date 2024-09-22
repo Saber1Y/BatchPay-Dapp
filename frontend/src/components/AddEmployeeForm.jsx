@@ -1,10 +1,6 @@
-import React, { useState, useEffect } from "react";
-import {
-  useWriteContract,
-  useReadContract,
-  useWatchContractEvent,
-  useAccount,
-} from "wagmi";
+import { useState } from "react";
+import { formatEther, parseEther } from "viem";
+import { useAccount, useWatchContractEvent, useWriteContract } from "wagmi";
 
 const AddEmployeeForm = ({ contractAddress, abi }) => {
   const [employeeAddress, setEmployeeAddress] = useState("");
@@ -18,17 +14,7 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
     writeContractAsync: addEmployeeWrite,
     isLoading: isAdding,
     error: addError,
-  } = useWriteContract({
-    account,
-    address: contractAddress,
-    abi: abi,
-    functionName: "addEmployee",
-
-    args: [employeeAddress, salary],
-    overrides: {
-      gasLimit: 1000000,
-    },
-  });
+  } = useWriteContract();
 
   // Hook for getting the owner's balance
   // const { data: ownerBalance, isLoading: balanceLoading } = useReadContract({
@@ -59,18 +45,18 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
   });
 
   //events
-  // useWatchContractEvent({
-  //   abi: abi,
-  //   address: contractAddress,
-  //   eventName: "EmployeePaid",
-  //   onLogs(logs) {
-  //     console.log("Logs received", logs);
-  //     setEvents((prevEvents) => [...prevEvents, logs]); // Store logs in the state
-  //   },
-  //   onError(error) {
-  //     console.error("Error received", error);
-  //   },
-  // });
+  useWatchContractEvent({
+    abi: abi,
+    address: contractAddress,
+    eventName: "EmployeeAdded",
+    onLogs(logs) {
+      console.log("Logs received", logs);
+      setEvents((prevEvents) => [...prevEvents, ...logs]); // Store logs in the state
+    },
+    onError(error) {
+      console.error("Error received", error);
+    },
+  });
 
   // useEffect(() => {
   //   if (ownerBalance) {
@@ -81,10 +67,19 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
   const handleAddEmployee = async (e) => {
     e.preventDefault();
 
-    await addEmployeeWrite();
-    if (addError) {
+    await addEmployeeWrite({
+      address: contractAddress,
+      abi: abi,
+      functionName: "addEmployee",
+      args: [employeeAddress, parseEther(salary)],
+      overrides: {
+        gasLimit: 1000000,
+      },
+    });
+    if (addError && addError.message) {
       console.error("Error adding employee:", addError);
       alert(`Failed to add employee: ${addError.message || "Unknown error"}`);
+      return;
     }
     alert("Employee added successfully!");
 
@@ -250,8 +245,8 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
         <ul className="text-white">
           {events.map((event, index) => (
             <li key={index}>
-              Employee {event.args[0]} was paid{" "}
-              {/* {ethers.utils.formatEther(event.args[1])} ETH */}
+              Employee {event.args.employee} was paid{" "}
+              {formatEther(event.args.amount)} ETH
             </li>
           ))}
         </ul>
