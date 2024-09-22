@@ -3,7 +3,7 @@ import {
   useWriteContract,
   useReadContract,
   useWatchContractEvent,
-  useAccount
+  useAccount,
 } from "wagmi";
 
 const AddEmployeeForm = ({ contractAddress, abi }) => {
@@ -78,13 +78,6 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
   //   }
   // }, [ownerBalance]);
 
-  useEffect(() => {
-    const savedEmployees = localStorage.getItem("employees");
-    if (savedEmployees) {
-      setEmployees(JSON.parse(savedEmployees));
-    }
-  }, []);
-
   const handleAddEmployee = async (e) => {
     e.preventDefault();
 
@@ -100,9 +93,6 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
       { address: employeeAddress, salary },
     ];
     setEmployees(updatedEmployees);
-
-    // Save to local storage
-    localStorage.setItem("employees", JSON.stringify(updatedEmployees));
 
     setEmployeeAddress("");
     setSalary("");
@@ -188,7 +178,7 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
           {isAdding ? "Adding..." : "Add Employee"}
         </button>
         {addError && (
-        <p className="text-red-600 mt-2">Error: {addError.message}</p>
+          <p className="text-red-600 mt-2">Error: {addError.message}</p>
         )}
       </form>
 
