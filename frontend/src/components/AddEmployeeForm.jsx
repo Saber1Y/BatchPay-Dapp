@@ -76,7 +76,7 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
         gasLimit: 1000000,
       },
     });
-    if (addError && addError.message) {
+    if (addError) {
       console.error("Error adding employee:", addError);
       alert(`Failed to add employee: ${addError.message || "Unknown error"}`);
       return;
@@ -173,7 +173,9 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
           {isAdding ? "Adding..." : "Add Employee"}
         </button>
         {addError && (
-          <p className="text-red-600 mt-2">Error: {addError.message}</p>
+          <p className="text-red-600 mt-2">
+            Error: {addError.message && "Request Rejected By User"}
+          </p>
         )}
       </form>
 
