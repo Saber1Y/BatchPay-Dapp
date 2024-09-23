@@ -28,21 +28,13 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
     writeContract: removeEmployeeWrite,
     isLoading: isRemoving,
     error: removeError,
-  } = useWriteContract({
-    address: contractAddress,
-    abi: abi,
-    functionName: "removeEmployee",
-  });
+  } = useWriteContract();
 
   const {
     writeContract: makeEmployeePayment,
     isLoading: pendingPayment,
     error: paymentError,
-  } = useWriteContract({
-    address: contractAddress,
-    abi: abi,
-    functionName: "payEmployees",
-  });
+  } = useWriteContract();
 
   //events
   useWatchContractEvent({
@@ -97,7 +89,10 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
     const employeeToDelete = employees[indexToDelete];
 
     try {
-      await removeEmployeeWrite?.({
+      await removeEmployeeWrite({
+        address: contractAddress,
+        abi: abi,
+        functionName: "removeEmployee",
         args: [employeeToDelete.address],
       });
       alert("Employee removed successfully on-chain!");
@@ -117,7 +112,11 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
 
   const handlePaymentEmployee = async () => {
     try {
-      await makeEmployeePayment?.();
+      await makeEmployeePayment({
+        address: contractAddress,
+        abi: abi,
+        functionName: "payEmployees",
+      });
       alert("Successfully made payment");
     } catch (error) {
       console.error("Error processing payments:", error);
