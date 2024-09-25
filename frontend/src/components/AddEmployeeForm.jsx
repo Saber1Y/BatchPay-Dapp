@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import { formatEther, parseEther } from "viem";
 import { useAccount, useWatchContractEvent, useWriteContract } from "wagmi";
+import { ToastContainer, toast } from "react-toastify";
+
+import "react-toastify/dist/ReactToastify.css";
 
 const AddEmployeeForm = ({ contractAddress, abi }) => {
   const [employeeAddress, setEmployeeAddress] = useState("");
@@ -75,17 +78,22 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
         gasLimit: 1000000,
       },
     });
+
     if (addError) {
-      console.error("Error adding employee:", addError);
-      alert(`Failed to add employee: ${addError.message || "Unknown error"}`);
+      toast.error(
+        `Failed to add employee: ${addError.message || "Unknown error"}`
+      );
       return;
     }
-    alert("Employee added successfully!");
+    toast.success("Employee added successfully!", {
+      position: "top-center",
+    });
 
     const updatedEmployees = [
       ...employees,
       { address: employeeAddress, salary },
     ];
+
     setEmployees(updatedEmployees);
 
     localStorage.setItem("employees", JSON.stringify(updatedEmployees));
@@ -96,23 +104,26 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
   const handleDeleteEmployee = async (indexToDelete) => {
     const employeeToDelete = employees[indexToDelete];
 
-    await removeEmployeeWrite({
-      address: contractAddress,
-      abi: abi,
-      functionName: "removeEmployee",
-      args: [employeeToDelete.address],
-    });
+    try {
+      await removeEmployeeWrite({
+        address: contractAddress,
+        abi: abi,
+        functionName: "removeEmployee",
+        args: [employeeToDelete.address],
+      });
 
-    setEmployees(employees.filter((_, index) => index !== indexToDelete));
+      const updatedEmployees = employees.filter(
+        (_, index) => index !== indexToDelete
+      );
+      setEmployees(updatedEmployees);
+      localStorage.setItem("employees", JSON.stringify(updatedEmployees));
 
-    localStorage.setItem("employees", JSON.stringify(updatedEmployees));
-
-    alert("Employee removed successfully on-chain!");
-    
-    if (removeError) {
-      console.error("Error removing employee:", removeError);
-      alert(
-        `Failed to remove employee: ${removeError.message || "Unknown error"}`
+      toast.success("Employee removed successfully on-chain!", {
+        position: "top-center",
+      });
+    } catch (error) {
+      toast.error(
+        `Failed to remove employee: ${removeError?.message || "Unknown error"}`
       );
     }
   };
@@ -140,6 +151,7 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
 
   return (
     <div className="container mx-auto py-4">
+      <ToastContainer />
       <h2 className="text-xl font-semibold mb-4">Employee List</h2>
       <form onSubmit={handleAddEmployee}>
         <div>
@@ -256,7 +268,7 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
         </>
       )}
       <div className="mt-6">
-        <h3 className="text-lg font-semibold">Event Log</h3>
+        <h3 className="text-lg font-semibold">Transaction History</h3>
         <ul className="text-white">
           {events.map((event, index) => (
             <li key={index}>
