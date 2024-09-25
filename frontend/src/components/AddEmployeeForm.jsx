@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { formatEther, parseEther } from "viem";
 import { useAccount, useWatchContractEvent, useWriteContract } from "wagmi";
 
@@ -50,6 +50,13 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
     },
   });
 
+  useEffect(() => {
+    const storedEmployees = JSON.parse(localStorage.getItem("employees"));
+    if (storedEmployees) {
+      setEmployees(storedEmployees);
+    }
+  }, []);
+
   // useEffect(() => {
   //   if (ownerBalance) {
   //     console.log("Deployer's balance:", ownerBalance.toString(), "ETH");
@@ -81,6 +88,7 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
     ];
     setEmployees(updatedEmployees);
 
+    localStorage.setItem("employees", JSON.stringify(updatedEmployees));
     setEmployeeAddress("");
     setSalary("");
   };
@@ -88,18 +96,24 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
   const handleDeleteEmployee = async (indexToDelete) => {
     const employeeToDelete = employees[indexToDelete];
 
-    try {
-      await removeEmployeeWrite({
-        address: contractAddress,
-        abi: abi,
-        functionName: "removeEmployee",
-        args: [employeeToDelete.address],
-      });
-      alert("Employee removed successfully on-chain!");
-      setEmployees(employees.filter((_, index) => index !== indexToDelete));
-    } catch (error) {
-      console.error("Error removing employee:", error);
-      alert(`Failed to remove employee: ${error.message || "Unknown error"}`);
+    await removeEmployeeWrite({
+      address: contractAddress,
+      abi: abi,
+      functionName: "removeEmployee",
+      args: [employeeToDelete.address],
+    });
+
+    setEmployees(employees.filter((_, index) => index !== indexToDelete));
+
+    localStorage.setItem("employees", JSON.stringify(updatedEmployees));
+
+    alert("Employee removed successfully on-chain!");
+    
+    if (removeError) {
+      console.error("Error removing employee:", removeError);
+      alert(
+        `Failed to remove employee: ${removeError.message || "Unknown error"}`
+      );
     }
   };
 
