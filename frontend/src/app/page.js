@@ -27,7 +27,7 @@ const WalletChecker = ({ onConnect }) => {
       setShowForm(false);
       router.push("../");
     }
-  }, [isConnected, onConnect]);
+  }, [isConnected, onConnect, router]);
 
   return (
     <>

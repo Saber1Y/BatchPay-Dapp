@@ -1,7 +1,7 @@
 {
   "transactions": [
     {
-      "hash": "0x0ab68e0183c57313d1bb176b9aabe3d746974d5272630a809fb7f29e967c1047",
+      "hash": null,
       "transactionType": "CREATE",
       "contractName": "Batch",
       "contractAddress": "0x49f96f3d59f694346f446b681642cfc707a7d6ba",
@@ -21,16 +21,14 @@
   ],
   "receipts": [],
   "libraries": [],
-  "pending": [
-    "0x0ab68e0183c57313d1bb176b9aabe3d746974d5272630a809fb7f29e967c1047"
-  ],
+  "pending": [],
   "returns": {
     "0": {
       "internal_type": "contract Batch",
       "value": "0x49F96F3d59f694346F446B681642CFC707a7D6BA"
     }
   },
-  "timestamp": 1727617212,
+  "timestamp": 1727447628,
   "chain": 11155111,
   "commit": "572be86"
 }
