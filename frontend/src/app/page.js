@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { WagmiProvider, useAccount } from "wagmi";
-import batchContract from "../../../backend/out/Batch.sol/Batch.json";
+import batchContract from "../Data/Batch.json";
 import AddEmployeeForm from "../components/AddEmployeeForm";
 import { config } from "./config";
 
