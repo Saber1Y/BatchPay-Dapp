@@ -46,7 +46,7 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
     eventName: "EmployeeAdded",
     onLogs(logs) {
       console.log("Logs received", logs);
-      setEvents((prevEvents) => [...prevEvents, ...logs]); // Store logs in the state
+      setEvents((prevEvents) => [...prevEvents, ...logs]);
     },
     onError(error) {
       console.error("Error received", error);
@@ -153,7 +153,7 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
     <div className="container mx-auto py-4">
       <ToastContainer />
       <h2 className="text-xl font-semibold mb-4">Employee List</h2>
-      <form onSubmit={handleAddEmployee}>
+      <form>
         <div>
           <label
             htmlFor="employeeAddress"
@@ -232,8 +232,9 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
                     {employee.address}
                   </td>
                   <td className="py-3 px-6 text-sm text-gray-900">
-                    {employee.salary}
+                    {formatEther(BigInt(employee.salary))}
                   </td>
+
                   <td className="py-3 px-6 text-sm text-gray-900">
                     <button
                       onClick={() => handleModifyEmployee(index)}
@@ -270,12 +271,16 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
       <div className="mt-6">
         <h3 className="text-lg font-semibold">Transaction History</h3>
         <ul className="text-white">
-          {events.map((event, index) => (
-            <li key={index}>
-              Employee {event.args.employee} was paid{" "}
-              {formatEther(event.args.amount)} ETH
-            </li>
-          ))}
+          {events?.length > 0 ? (
+            events.map((event, index) => (
+              <li key={index}>
+                Employee {event.args?.employee} was paid{" "}
+                {formatEther(event.args?.amount || "0")} ETH
+              </li>
+            ))
+          ) : (
+            <li>No transactions yet.</li>
+          )}
         </ul>
       </div>
     </div>
