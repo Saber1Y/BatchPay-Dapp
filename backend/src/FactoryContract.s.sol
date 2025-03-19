@@ -1,6 +1,5 @@
-
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.29;
+pragma solidity 0.8.20;
 
 import "./BatchPay.sol";
 
@@ -22,7 +21,9 @@ contract FactoryContract {
         emit FactoryCreated(msg.sender, address(batch));
     }
 
-        function getCompanyPayroll(address _company) external view returns (address) {
+    function getCompanyPayroll(
+        address _company
+    ) external view returns (address) {
         return companyPayroll[_company];
     }
 }

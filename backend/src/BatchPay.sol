@@ -1,14 +1,19 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.29;
+pragma solidity 0.8.20;
 
 contract BatchPay {
     error NotAuthorized();
     error NotEnoughFunds();
     error TransactionFailed();
+    error EmployeeAlreadyExists();
+    error InvalidSalary();
 
     address public owner;
     mapping(address => uint256) public employeesSalaries;
+    mapping(address => bool) private isEmployees; //mapping to check is addr exists
     address[] public employees;
+
+    bool isEmployee = true;
 
     event EmployeePaid(address indexed employee, uint256 amount);
     event EmployeeAdded(address indexed employee, uint256 amount);
@@ -29,6 +34,14 @@ contract BatchPay {
         address _employee,
         uint256 _salary
     ) external onlyOwner {
+        if (isEmployees[_employee]) {
+            revert EmployeeAlreadyExists();
+        }
+
+        if (_salary == 0) {
+            revert InvalidSalary();
+        }
+
         employees.push(_employee);
         employeesSalaries[_employee] = _salary;
         emit EmployeeAdded(_employee, _salary);
