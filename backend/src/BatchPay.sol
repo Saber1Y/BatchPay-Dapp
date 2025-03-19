@@ -7,13 +7,13 @@ contract BatchPay {
     error TransactionFailed();
     error EmployeeAlreadyExists();
     error InvalidSalary();
+    error EmployeeNotFound();
 
     address public owner;
     mapping(address => uint256) public employeesSalaries;
     mapping(address => bool) private isEmployees; //mapping to check is addr exists
     address[] public employees;
 
-    bool isEmployee = true;
 
     event EmployeePaid(address indexed employee, uint256 amount);
     event EmployeeAdded(address indexed employee, uint256 amount);
@@ -48,6 +48,10 @@ contract BatchPay {
     }
 
     function removeEmployee(address _employee) external onlyOwner {
+        if (!isEmployees[_employee]) {
+            revert EmployeeNotFound();
+        }
+
         for (uint256 i = 0; i < employees.length; i++) {
             if (employees[i] == _employee) {
                 employees[i] = employees[employees.length - 1];
@@ -62,24 +66,29 @@ contract BatchPay {
         }
     }
 
-    function payEmployees() external onlyOwner {
-        for (uint256 i = 0; i < employees.length; i++) {
-            address employee = employees[i];
-            uint256 salary = employeesSalaries[employee];
+function payEmployees() external onlyOwner {
+    for (uint256 i = 0; i < employees.length; i++) {
+        address employee = employees[i];
+        uint256 salary = employeesSalaries[employee];
 
-            if (address(this).balance < salary) {
-                revert NotEnoughFunds();
-            }
+        if (salary == 0 || !isEmployees[employee]) {
+            continue; // Skip employees without a salary
+        }
 
-            (bool success, ) = payable(employee).call{value: salary}(""); // returns if transfer is successful
+        if (address(this).balance < salary) {
+            revert NotEnoughFunds();
+        }
 
-            if (!success) {
-                revert TransactionFailed();
-            }
-
+        (bool success, ) = payable(employee).call{value: salary}("");
+        if (success) {
             emit EmployeePaid(employee, salary);
+        } else {
+            revert TransactionFailed();
         }
     }
+}
+
+
 
     function depositFunds() external payable onlyOwner {}
 
