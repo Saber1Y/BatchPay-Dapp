@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.19;
+pragma solidity 0.8.29;
 
-contract Batch {
+contract BatchPay {
     error NotAuthorized();
     error NotEnoughFunds();
     error TransactionFailed();
@@ -21,8 +21,8 @@ contract Batch {
         _;
     }
 
-    constructor() {
-        owner = msg.sender;
+    constructor(address _owner) {
+        owner = _owner;
     }
 
     function addEmployee(
