@@ -26,4 +26,8 @@ contract BatchTest is Test {
             "Employee's address should be 1 ether"
         );
     }
+
+    function testRemoveEmployee() public { 
+        batchPay.removeEmployee(employee1, 1 ether);
+    }
 }
