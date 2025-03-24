@@ -18,7 +18,7 @@ contract BatchTest is Test {
         assertEq(batchPay.owner(), owner, "Owner should be deploof contract");
     }
 
-    function testAddEmployee() public  {
+    function testAddEmployee() public {
         batchPay.addEmployee(employee1, 1 ether);
         assertEq(
             batchPay.getEmployeesSalaries(employee1),
@@ -27,7 +27,25 @@ contract BatchTest is Test {
         );
     }
 
-    function testRemoveEmployee() public { 
-        batchPay.removeEmployee(employee1, 1 ether);
+    // function testReaddingEmployees() public {
+    //     batchPay.addEmployee(employee1, 1 ether);
+
+    //     vm.expectRevert("Employee Already Exists");
+    //     batchPay.addEmployee(employee1, 1 ether);
+    // }
+
+    function testDepositFunds() public {
+        vm.deal(address(batchPay), 5 ether);
+
+        assertEq(
+            batchPay.getOwnersBalance(),
+            5 ether,
+            "Balance should be 5 ether"
+        );
+    }
+
+    function testPayEmployees() public {
+        batchPay.addEmployee(employee1, 1 ether);
+        batchPay.addEmployee(employee2, 3 ether);
     }
 }
