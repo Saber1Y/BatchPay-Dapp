@@ -14,7 +14,7 @@ contract BatchTest is Test {
     function setUp() public {
         batchPay = new BatchPay(owner);
     }
-    function testIfOwnerIsOwner() public view {
+    function testIfOwnerIsOwner() public  {
         assertEq(batchPay.owner(), owner, "Owner should be deploof contract");
     }
 
@@ -30,7 +30,8 @@ contract BatchTest is Test {
     // function testReaddingEmployees() public {
     //     batchPay.addEmployee(employee1, 1 ether);
 
-    //     vm.expectRevert("Employee Already Exists");
+    //     // Expect the next call to revert with the EmployeeAlreadyExists error
+    //     vm.expectRevert(BatchPay.EmployeeAlreadyExists.selector);
     //     batchPay.addEmployee(employee1, 1 ether);
     // }
 

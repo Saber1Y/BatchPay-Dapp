@@ -129,7 +129,7 @@ export default function Home() {
                   </ol>
                 </div>
 
-                <div className="mt-8">
+                <div className="mt-8 w-full">
                   <h2 className="text-2xl font-semibold text-gray-800 mb-4">
                     Ready to Start?
                   </h2>
@@ -137,7 +137,9 @@ export default function Home() {
                     Take control of your payroll now. Connect your wallet to
                     begin your journey as a BatchPay CEO.
                   </p>
-                  <ConnectButton className="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700 transition duration-200" />
+                  <p className="flex justify-center">
+                    <ConnectButton className=" bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700 transition duration-2" />
+                  </p>
                 </div>
               </main>
             </div>
