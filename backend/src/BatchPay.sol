@@ -11,7 +11,7 @@ contract BatchPay {
     error FeeTooHigh();
     error TransferFailed();
 
-    address public owner;
+    address public immutable owner;
     mapping(address => uint256) public employeesSalaries;
     mapping(address => uint256) private employeeIndex; // Tracks array position
     address[] public employees;
