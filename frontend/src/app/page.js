@@ -11,7 +11,7 @@ import AddEmployeeForm from "../components/AddEmployeeForm";
 import { config } from "./config";
 
 // const contractAddress = '0x5FbDB2315678afecb367f032d93F642f64180aa3';
-const contractAddress = "0x8a791620dd6260079bf849dc5567adc3f2fdc318";
+const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 const abi = batchContract.abi;
 
 const WalletChecker = ({ onConnect }) => {

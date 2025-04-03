@@ -5,8 +5,8 @@ import {BatchPay} from "../src/BatchPay.sol";
 import {Test} from "forge-std/Test.sol";
 
 contract BatchTest is Test {
-    BatchPay batchPay;
-    address owner = address(this);
+    BatchPay batchPay; //create a instance of BatchPay contract
+    address owner = address(this); //intialized a owner  to whoo
 
     address employee1 = address(0x123);
     address employee2 = address(0x234);
@@ -20,6 +20,7 @@ contract BatchTest is Test {
 
     function testAddEmployee() public {
         batchPay.addEmployee(employee1, 1 ether);
+        
         assertEq(
             batchPay.getEmployeesSalaries(employee1),
             1 ether,
