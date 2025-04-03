@@ -14,7 +14,7 @@ contract BatchTest is Test {
     function setUp() public {
         batchPay = new BatchPay(owner);
     }
-    function testIfOwnerIsOwner() public  {
+    function testIfOwnerIsOwner() public view  {
         assertEq(batchPay.owner(), owner, "Owner should be deploof contract");
     }
 
