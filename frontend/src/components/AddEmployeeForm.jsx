@@ -4,11 +4,14 @@ import { useAccount, useWatchContractEvent, useWriteContract } from "wagmi";
 import { ToastContainer, toast } from "react-toastify";
 
 import "react-toastify/dist/ReactToastify.css";
+import TransactionHistory from "./TransactionHistory";
+
 
 const AddEmployeeForm = ({ contractAddress, abi }) => {
   const [employeeAddress, setEmployeeAddress] = useState("");
   const [salary, setSalary] = useState("");
   const [employees, setEmployees] = useState([]);
+
   const [events, setEvents] = useState([]);
   const account = useAccount();
 
@@ -43,15 +46,50 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
   useWatchContractEvent({
     abi: abi,
     address: contractAddress,
+    eventName: "EmployeePaid",
+    onLogs(logs) {
+      setEvents((prev) => [
+        ...prev,
+        ...logs.map((log) => ({ ...log, eventType: "payment" })),
+      ]);
+    },
+    onError: (error) => {
+      console.error("Event error:", error);
+    },
+    poll: true,
+  });
+
+  useWatchContractEvent({
+    abi: abi,
+    address: contractAddress,
+    eventName: "EmployeePaid",
+    onLogs(logs) {
+      setEvents((prev) => [
+        ...prev,
+        ...logs.map((log) => ({ ...log, eventType: "payment" })),
+      ]);
+    },
+    onError: (error) => {
+      console.error("Event error:", error);
+    },
+    poll: true,
+  });
+
+  useWatchContractEvent({
+    abi: abi,
+    address: contractAddress,
     eventName: "EmployeeAdded",
     onLogs(logs) {
-      console.log("Logs received", logs);
-      setEvents((prevEvents) => [...prevEvents, ...logs]);
-    },
-    onError(error) {
-      console.error("Error received", error);
+      setEvents((prev) => [
+        ...prev,
+        ...logs.map((log) => ({ ...log, eventType: "addition" })),
+      ]);
     },
   });
+
+  useEffect(() => {
+    console.log("Current Events:", events);
+  }, [events]);
 
   useEffect(() => {
     const storedEmployees = JSON.parse(localStorage.getItem("employees"));
@@ -81,7 +119,10 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
 
     if (addError) {
       toast.error(
-        `Failed to add employee: ${addError.message || "Unknown error"}`
+        `Failed to add employee: ${addError.message || "Unknown error"}`,
+        {
+          position: "top-center",
+        }
       );
       return;
     }
@@ -176,7 +217,7 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
             htmlFor="salary"
             className="block text-[18px] font-medium text-white"
           >
-            Salary (ETH)
+            Salary (SPECIFY IN WEI)
           </label>
           <input
             type="number"
@@ -213,7 +254,7 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
                   Employee Address
                 </th>
                 <th className="py-3 px-6 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider border-b">
-                  Salary (ETH)
+                  Salary (WEI)
                 </th>
                 <th className="py-3 px-6 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider border-b">
                   Actions
@@ -269,19 +310,7 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
         </>
       )}
       <div className="mt-6">
-        <h3 className="text-lg font-semibold">Transaction History</h3>
-        <ul className="text-white">
-          {events?.length > 0 ? (
-            events.map((event, index) => (
-              <li key={index}>
-                Employee {event.args?.employee} was paid{" "}
-                {formatEther(event.args?.amount || "0")} ETH
-              </li>
-            ))
-          ) : (
-            <li>No transactions yet.</li>
-          )}
-        </ul>
+        <TransactionHistory />
       </div>
     </div>
   );

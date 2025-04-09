@@ -19,7 +19,7 @@ const localhost = defineChain({
 export const config = getDefaultConfig({
   // export const config = createConfig({
   appName: "BatchPay",
-  projectId: "Batch_next",
+  projectId: "a327504f34a47013f8b8b960a2b8ecde",
   appDescription: "Batch Next Project",
   chains: [mainnet, sepolia, localhost],
   transports: {

@@ -8,19 +8,24 @@ contract BatchTest is Test {
     BatchPay batchPay; //create a instance of BatchPay contract
     address owner = address(this); //intialized a owner  to whoo
 
+
     address employee1 = address(0x123);
     address employee2 = address(0x234);
 
+    event EmployeeAdded(address indexed employee, uint256 amount);
     function setUp() public {
         batchPay = new BatchPay(owner);
     }
-    function testIfOwnerIsOwner() public view  {
+    function testIfOwnerIsOwner() public view {
         assertEq(batchPay.owner(), owner, "Owner should be deploof contract");
     }
 
     function testAddEmployee() public {
+        vm.expectEmit(true, true, false, true);
+        emit EmployeeAdded(employee1, 1 ether);
+
         batchPay.addEmployee(employee1, 1 ether);
-        
+
         assertEq(
             batchPay.getEmployeesSalaries(employee1),
             1 ether,
