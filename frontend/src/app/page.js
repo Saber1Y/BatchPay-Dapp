@@ -9,8 +9,10 @@ import { WagmiProvider, useAccount } from "wagmi";
 import batchContract from "../Data/Batch.json";
 import AddEmployeeForm from "../components/AddEmployeeForm";
 import { config } from "./config";
+import Navbar from "../components/Navbar";
 
-// const contractAddress = '0x5FbDB2315678afecb367f032d93F642f64180aa3';
+
+
 const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 const abi = batchContract.abi;
 
@@ -25,7 +27,7 @@ const WalletChecker = ({ onConnect }) => {
       onConnect();
     } else {
       setShowForm(false);
-      router.push("../");
+      router.push("/");
     }
   }, [isConnected, onConnect, router]);
 
@@ -39,6 +41,10 @@ const WalletChecker = ({ onConnect }) => {
     </>
   );
 };
+
+
+
+
 export default function Home() {
   const queryClient = new QueryClient();
   const [isWalletConnected, setIsWalletConnected] = useState(false);
@@ -47,16 +53,7 @@ export default function Home() {
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider>
-          <nav className="bg-white border-gray-200 dark:bg-gray-900">
-            <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-              <span className="self-center text-2xl font-semibold whitespace-nowrap cursor-pointer dark:text-white">
-                BatchPay
-              </span>
-              <div className="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
-                <ConnectButton />
-              </div>
-            </div>
-          </nav>
+          <Navbar contractAddress={contractAddress} abi={abi} />
 
           {!isWalletConnected && (
             <div className="min-h-screen bg-gray-100 flex flex-col justify-center items-center p-6">

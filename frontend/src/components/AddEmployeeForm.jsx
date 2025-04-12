@@ -3,16 +3,16 @@ import { formatEther, parseEther } from "viem";
 import { useAccount, useWatchContractEvent, useWriteContract } from "wagmi";
 import { ToastContainer, toast } from "react-toastify";
 
+
 import "react-toastify/dist/ReactToastify.css";
 import TransactionHistory from "./TransactionHistory";
-
 
 const AddEmployeeForm = ({ contractAddress, abi }) => {
   const [employeeAddress, setEmployeeAddress] = useState("");
   const [salary, setSalary] = useState("");
   const [employees, setEmployees] = useState([]);
 
-  const [events, setEvents] = useState([]);
+  // const [events, setEvents] = useState([]);
   const account = useAccount();
 
   // Hook for adding an employee
@@ -43,53 +43,50 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
   } = useWriteContract();
 
   //events
-  useWatchContractEvent({
-    abi: abi,
-    address: contractAddress,
-    eventName: "EmployeePaid",
-    onLogs(logs) {
-      setEvents((prev) => [
-        ...prev,
-        ...logs.map((log) => ({ ...log, eventType: "payment" })),
-      ]);
-    },
-    onError: (error) => {
-      console.error("Event error:", error);
-    },
-    poll: true,
-  });
+  // useWatchContractEvent({
+  //   abi: abi,
+  //   address: contractAddress,
+  //   eventName: "EmployeePaid",
+  //   onLogs(logs) {
+  //     setEvents((prev) => [
+  //       ...prev,
+  //       ...logs.map((log) => ({ ...log, eventType: "payment" })),
+  //     ]);
+  //   },
+  //   onError: (error) => {
+  //     console.error("Event error:", error);
+  //   },
+  //   poll: true,
+  // });
 
-  useWatchContractEvent({
-    abi: abi,
-    address: contractAddress,
-    eventName: "EmployeePaid",
-    onLogs(logs) {
-      setEvents((prev) => [
-        ...prev,
-        ...logs.map((log) => ({ ...log, eventType: "payment" })),
-      ]);
-    },
-    onError: (error) => {
-      console.error("Event error:", error);
-    },
-    poll: true,
-  });
+  // useWatchContractEvent({
+  //   abi: abi,
+  //   address: contractAddress,
+  //   eventName: "EmployeePaid",
+  //   onLogs(logs) {
+  //     console.log("Payment logs:", logs); // Debug
+  //     setEvents((prev) => [
+  //       ...prev,
+  //       ...logs.map((log) => ({ ...log, eventType: "payment" })),
+  //     ]);
+  //   },
+  // });
 
-  useWatchContractEvent({
-    abi: abi,
-    address: contractAddress,
-    eventName: "EmployeeAdded",
-    onLogs(logs) {
-      setEvents((prev) => [
-        ...prev,
-        ...logs.map((log) => ({ ...log, eventType: "addition" })),
-      ]);
-    },
-  });
+  // useWatchContractEvent({
+  //   abi: abi,
+  //   address: contractAddress,
+  //   eventName: "EmployeeAdded",
+  //   onLogs(logs) {
+  //     setEvents((prev) => [
+  //       ...prev,
+  //       ...logs.map((log) => ({ ...log, eventType: "addition" })),
+  //     ]);
+  //   },
+  // });
 
-  useEffect(() => {
-    console.log("Current Events:", events);
-  }, [events]);
+  // useEffect(() => {
+  //   console.log("Current Events:", events);
+  // }, [events]);
 
   useEffect(() => {
     const storedEmployees = JSON.parse(localStorage.getItem("employees"));
@@ -193,6 +190,7 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
   return (
     <div className="container mx-auto py-4">
       <ToastContainer />
+
       <h2 className="text-xl font-semibold mb-4">Employee List</h2>
       <form>
         <div>
@@ -244,7 +242,6 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
           </p>
         )}
       </form>
-
       {employees.length > 0 && (
         <>
           <table className="min-w-full bg-white text-black mt-5 rounded-lg shadow-md overflow-hidden">
@@ -310,7 +307,7 @@ const AddEmployeeForm = ({ contractAddress, abi }) => {
         </>
       )}
       <div className="mt-6">
-        <TransactionHistory />
+        <TransactionHistory abi={abi} contractAddress={contractAddress} />
       </div>
     </div>
   );
